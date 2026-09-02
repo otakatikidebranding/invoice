@@ -134,24 +134,31 @@ export function generateWhatsAppMessage(invoice: InvoiceData): string {
   const dueDate = formatDateIndo(invoice.dueDate);
 
   let schemeText = '';
+  const dpDateStr = invoice.dpReceivedDate ? ` (Diterima: ${formatDateIndo(invoice.dpReceivedDate)})` : '';
+  const finalDateStr = invoice.finalReceivedDate ? ` (Lunas: ${formatDateIndo(invoice.finalReceivedDate)})` : '';
+
   if (invoice.paymentScheme === 'dp_50') {
     if (invoice.paymentStatus === 'dp_paid') {
-      schemeText = `*Tagihan Pelunasan (50%):* ${formatRupiah(calc.remainingAmount)} (DP 50% sebelumnya telah terbayar)`;
+      schemeText = `*Tagihan Pelunasan (50%):* ${formatRupiah(calc.remainingAmount)}\n*Status DP 50%:* Sudah Diterima ${formatRupiah(calc.dpAmount)}${dpDateStr}`;
     } else if (invoice.paymentStatus === 'paid') {
-      schemeText = `*Status:* Lunas 100% (Terima Kasih)`;
+      schemeText = `*Status Pembayaran:* LUNAS 100% (Fully Paid)${finalDateStr}${dpDateStr ? `\n*Riwayat DP:* Telah diterima ${formatRupiah(calc.dpAmount)}${dpDateStr}` : ''}`;
     } else {
       schemeText = `*Skema:* DP 50% (${formatRupiah(calc.dpAmount)}) | *Sisa Pelunasan:* ${formatRupiah(calc.remainingAmount)}`;
     }
   } else if (invoice.paymentScheme === 'dp_custom') {
     if (invoice.paymentStatus === 'dp_paid') {
-      schemeText = `*Tagihan Pelunasan:* ${formatRupiah(calc.remainingAmount)} (DP Nominal Khusus sebesar ${formatRupiah(calc.dpAmount)} sebelumnya telah terbayar)`;
+      schemeText = `*Tagihan Pelunasan:* ${formatRupiah(calc.remainingAmount)}\n*Status DP:* Nominal Khusus ${formatRupiah(calc.dpAmount)} Sudah Diterima${dpDateStr}`;
     } else if (invoice.paymentStatus === 'paid') {
-      schemeText = `*Status:* Lunas 100% (Terima Kasih)`;
+      schemeText = `*Status Pembayaran:* LUNAS 100% (Fully Paid)${finalDateStr}${dpDateStr ? `\n*Riwayat DP:* Telah diterima ${formatRupiah(calc.dpAmount)}${dpDateStr}` : ''}`;
     } else {
       schemeText = `*Skema:* DP Nominal Khusus (${formatRupiah(calc.dpAmount)}) | *Sisa Tagihan (Pelunasan):* ${formatRupiah(calc.remainingAmount)}`;
     }
   } else {
-    schemeText = `*Skema:* Pembayaran Penuh (Full Payment) - ${formatRupiah(calc.grandTotal)}`;
+    if (invoice.paymentStatus === 'paid') {
+      schemeText = `*Status Pembayaran:* LUNAS 100% (${formatRupiah(calc.grandTotal)})${finalDateStr}`;
+    } else {
+      schemeText = `*Skema:* Pembayaran Penuh (Full Payment) - ${formatRupiah(calc.grandTotal)}`;
+    }
   }
 
   const itemSummary = invoice.items
