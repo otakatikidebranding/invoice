@@ -1,0 +1,6 @@
+{
+  "name": "otakatikide Invoice Generator",
+  "description": "Aplikasi Web Invoice profesional dan modern untuk studio branding & desain otakatikide dengan sistem DP/Pelunasan, ekspor PDF, dan integrasi WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
