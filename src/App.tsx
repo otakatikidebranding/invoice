@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InvoiceData } from './types';
 import { INITIAL_INVOICE_DATA } from './utils/presets';
+import { calculateInvoice, formatRupiah } from './utils/formatters';
 import { HeaderNavbar } from './components/HeaderNavbar';
 import { FormEditor } from './components/FormEditor';
 import { InvoicePaper } from './components/InvoicePaper';
@@ -120,7 +121,7 @@ export default function App() {
       />
 
       {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 print:p-0 print:m-0 print:max-w-full">
         {/* Quick studio notice strip */}
         <div className="mb-4 bg-white p-3 rounded-xl border border-neutral-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs no-print">
           <div className="flex items-center gap-2.5 text-neutral-700">
@@ -134,7 +135,11 @@ export default function App() {
             <span>
               Skema:{' '}
               <strong className="text-neutral-950 font-bold">
-                {invoice.paymentScheme === 'dp_50' ? 'DP 50% & Pelunasan' : 'Full Payment 100%'}
+                {invoice.paymentScheme === 'dp_50'
+                  ? 'DP 50% & Pelunasan'
+                  : invoice.paymentScheme === 'dp_custom'
+                  ? `DP Custom (${formatRupiah(calculateInvoice(invoice).dpAmount)})`
+                  : 'Full Payment 100%'}
               </strong>
             </span>
             <span>
@@ -143,7 +148,9 @@ export default function App() {
                 {invoice.paymentStatus === 'paid'
                   ? 'Lunas'
                   : invoice.paymentStatus === 'dp_paid'
-                  ? 'DP 50% Paid'
+                  ? invoice.paymentScheme === 'dp_custom'
+                    ? 'DP Custom Paid'
+                    : 'DP 50% Paid'
                   : 'Draft / Unpaid'}
               </strong>
             </span>
@@ -152,15 +159,15 @@ export default function App() {
 
         {/* View Layout Switcher */}
         {viewMode === 'split' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start print:block">
             {/* Left: Form Editor (5 cols on lg) */}
-            <div className="lg:col-span-6 xl:col-span-5 space-y-4">
+            <div className="lg:col-span-6 xl:col-span-5 space-y-4 no-print">
               <FormEditor invoice={invoice} onChange={setInvoice} />
             </div>
 
             {/* Right: Live Invoice Paper Preview (7 cols on lg) */}
-            <div className="lg:col-span-6 xl:col-span-7 sticky top-20">
-              <div className="bg-neutral-200/70 p-3 sm:p-6 rounded-2xl border border-neutral-300 shadow-inner flex flex-col items-center justify-center overflow-x-auto">
+            <div className="lg:col-span-6 xl:col-span-7 sticky top-20 print:static print:w-full print:m-0 print:p-0">
+              <div className="invoice-container-wrapper bg-neutral-200/70 p-3 sm:p-6 rounded-2xl border border-neutral-300 shadow-inner flex flex-col items-center justify-center overflow-x-auto print:bg-transparent print:p-0 print:border-none print:shadow-none print:rounded-none print:m-0">
                 <div className="w-full flex justify-between items-center pb-3 text-xs text-neutral-600 font-medium px-2 no-print">
                   <span className="flex items-center gap-1.5 font-semibold text-neutral-900">
                     <FileText className="w-3.5 h-3.5" />
@@ -177,14 +184,14 @@ export default function App() {
         )}
 
         {viewMode === 'editor' && (
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-3xl mx-auto space-y-4 no-print">
             <FormEditor invoice={invoice} onChange={setInvoice} />
           </div>
         )}
 
         {viewMode === 'preview' && (
-          <div className="max-w-4xl mx-auto space-y-4">
-            <div className="bg-neutral-200/70 p-3 sm:p-8 rounded-2xl border border-neutral-300 shadow-inner flex flex-col items-center justify-center overflow-x-auto">
+          <div className="max-w-4xl mx-auto space-y-4 print:max-w-full print:m-0 print:p-0">
+            <div className="invoice-container-wrapper bg-neutral-200/70 p-3 sm:p-8 rounded-2xl border border-neutral-300 shadow-inner flex flex-col items-center justify-center overflow-x-auto print:bg-transparent print:p-0 print:border-none print:shadow-none print:rounded-none print:m-0">
               <InvoicePaper invoice={invoice} />
             </div>
           </div>
