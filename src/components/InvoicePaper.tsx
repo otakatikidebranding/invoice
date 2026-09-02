@@ -36,7 +36,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         return (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-neutral-900 text-[#FFD400] border border-neutral-800 shadow-2xs">
             <Clock className="w-3.5 h-3.5 text-[#FFD400]" />
-            DP 50% SUDAH DIBAYAR
+            {invoice.paymentScheme === 'dp_custom'
+              ? `DP SUDAH DIBAYAR (${formatRupiah(calc.dpAmount)})`
+              : 'DP 50% SUDAH DIBAYAR'}
           </div>
         );
       default:
@@ -256,16 +258,20 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                   Rincian Skema Pembayaran
                 </span>
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-[#FFD400] text-neutral-950">
-                  {invoice.paymentScheme === 'dp_50' ? 'SISTEM DP 50%' : 'FULL PAYMENT'}
+                  {invoice.paymentScheme === 'dp_50'
+                    ? 'SISTEM DP 50%'
+                    : invoice.paymentScheme === 'dp_custom'
+                    ? `DP NOMINAL KHUSUS (${calc.dpPercentage.toFixed(0)}%)`
+                    : 'FULL PAYMENT'}
                 </span>
               </div>
 
-              {invoice.paymentScheme === 'dp_50' ? (
+              {invoice.paymentScheme === 'dp_50' || invoice.paymentScheme === 'dp_custom' ? (
                 <div className="pt-3 space-y-2 text-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-neutral-300 flex items-center gap-1.5 font-medium">
                       <span className="w-2 h-2 rounded-full bg-[#FFD400]"></span>
-                      Nominal DP 50% (Awal):
+                      {invoice.paymentScheme === 'dp_custom' ? 'Nominal DP (Manual):' : 'Nominal DP 50% (Awal):'}
                     </span>
                     <span className="font-mono font-black text-base text-[#FFD400]">
                       {formatRupiah(calc.dpAmount)}
@@ -274,7 +280,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                   <div className="flex justify-between items-center text-neutral-400">
                     <span className="flex items-center gap-1.5 font-medium">
                       <span className="w-2 h-2 rounded-full bg-neutral-600"></span>
-                      Sisa Pelunasan 50% (Akhir):
+                      Sisa Tagihan (Pelunasan):
                     </span>
                     <span className="font-mono font-bold text-neutral-200">
                       {formatRupiah(calc.remainingAmount)}
@@ -283,11 +289,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                   <div className="pt-2 border-t border-neutral-800 text-[11px] text-neutral-400">
                     {invoice.paymentStatus === 'dp_paid' ? (
                       <span className="text-[#FFD400] font-bold">
-                        ✓ DP 50% telah lunas. Tagihan saat ini: Sisa Pelunasan {formatRupiah(calc.remainingAmount)}
+                        ✓ DP ({formatRupiah(calc.dpAmount)}) telah lunas. Tagihan saat ini: Sisa Pelunasan {formatRupiah(calc.remainingAmount)}
                       </span>
                     ) : (
                       <span>
-                        *Pekerjaan dimulai setelah transfer DP 50% diterima.
+                        *Pekerjaan dimulai setelah transfer DP ({formatRupiah(calc.dpAmount)}) diterima.
                       </span>
                     )}
                   </div>
