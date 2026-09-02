@@ -55,7 +55,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
   return (
     <div
       id="invoice-document"
-      className="invoice-paper bg-white text-neutral-900 mx-auto w-full max-w-[800px] p-4 sm:p-5 print:p-5 shadow-xl border border-neutral-200 print-shadow-none print-m-0 rounded-xl print:rounded-none relative flex flex-col justify-between text-xs"
+      className="invoice-paper bg-white text-neutral-900 mx-auto w-full max-w-[800px] p-4 sm:p-5 shadow-xl border border-neutral-200 print-shadow-none print-m-0 rounded-xl print:rounded-none relative flex flex-col justify-between text-xs"
       style={{ boxSizing: 'border-box' }}
     >
       {/* Top Section */}
