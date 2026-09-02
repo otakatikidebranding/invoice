@@ -24,7 +24,7 @@ export interface LineItem {
   price: number;
 }
 
-export type PaymentScheme = 'dp_50' | 'full';
+export type PaymentScheme = 'dp_50' | 'dp_custom' | 'full';
 
 export type PaymentStatus = 'draft' | 'dp_paid' | 'paid';
 
@@ -58,7 +58,10 @@ export interface InvoiceData {
   discount: InvoiceDiscount;
   tax: InvoiceTax;
   paymentScheme: PaymentScheme;
+  customDpAmount?: number;
   paymentStatus: PaymentStatus;
+  dpReceivedDate?: string;
+  finalReceivedDate?: string;
   paymentDetails: PaymentDetails;
   notes: string;
   terms: string[];
