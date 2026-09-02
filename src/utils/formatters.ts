@@ -58,6 +58,7 @@ export interface InvoiceCalculations {
   dpAmount: number;
   remainingAmount: number;
   activePayableAmount: number;
+  dpPercentage: number;
 }
 
 export function calculateInvoice(invoice: InvoiceData): InvoiceCalculations {
@@ -85,15 +86,33 @@ export function calculateInvoice(invoice: InvoiceData): InvoiceCalculations {
 
   const grandTotal = taxableBase + taxAmount;
 
-  const dpAmount = Math.round(grandTotal * 0.5);
-  const remainingAmount = grandTotal - dpAmount;
+  let dpAmount = 0;
+  let remainingAmount = 0;
 
-  const activePayableAmount =
-    invoice.paymentScheme === 'dp_50'
-      ? invoice.paymentStatus === 'dp_paid'
-        ? remainingAmount
-        : dpAmount
-      : grandTotal;
+  if (invoice.paymentScheme === 'dp_50') {
+    dpAmount = Math.round(grandTotal * 0.5);
+    remainingAmount = Math.max(0, grandTotal - dpAmount);
+  } else if (invoice.paymentScheme === 'dp_custom') {
+    const customDp =
+      typeof invoice.customDpAmount === 'number' && invoice.customDpAmount >= 0
+        ? invoice.customDpAmount
+        : Math.round(grandTotal * 0.5);
+    dpAmount = Math.min(grandTotal, customDp);
+    remainingAmount = Math.max(0, grandTotal - dpAmount);
+  } else {
+    // Full payment
+    dpAmount = grandTotal;
+    remainingAmount = 0;
+  }
+
+  const dpPercentage = grandTotal > 0 ? (dpAmount / grandTotal) * 100 : 0;
+
+  const isDpScheme = invoice.paymentScheme === 'dp_50' || invoice.paymentScheme === 'dp_custom';
+  const activePayableAmount = isDpScheme
+    ? invoice.paymentStatus === 'dp_paid'
+      ? remainingAmount
+      : dpAmount
+    : grandTotal;
 
   return {
     subtotal,
@@ -103,6 +122,7 @@ export function calculateInvoice(invoice: InvoiceData): InvoiceCalculations {
     dpAmount,
     remainingAmount,
     activePayableAmount,
+    dpPercentage,
   };
 }
 
@@ -121,6 +141,14 @@ export function generateWhatsAppMessage(invoice: InvoiceData): string {
       schemeText = `*Status:* Lunas 100% (Terima Kasih)`;
     } else {
       schemeText = `*Skema:* DP 50% (${formatRupiah(calc.dpAmount)}) | *Sisa Pelunasan:* ${formatRupiah(calc.remainingAmount)}`;
+    }
+  } else if (invoice.paymentScheme === 'dp_custom') {
+    if (invoice.paymentStatus === 'dp_paid') {
+      schemeText = `*Tagihan Pelunasan:* ${formatRupiah(calc.remainingAmount)} (DP Nominal Khusus sebesar ${formatRupiah(calc.dpAmount)} sebelumnya telah terbayar)`;
+    } else if (invoice.paymentStatus === 'paid') {
+      schemeText = `*Status:* Lunas 100% (Terima Kasih)`;
+    } else {
+      schemeText = `*Skema:* DP Nominal Khusus (${formatRupiah(calc.dpAmount)}) | *Sisa Tagihan (Pelunasan):* ${formatRupiah(calc.remainingAmount)}`;
     }
   } else {
     schemeText = `*Skema:* Pembayaran Penuh (Full Payment) - ${formatRupiah(calc.grandTotal)}`;
