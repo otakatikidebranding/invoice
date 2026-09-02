@@ -400,6 +400,50 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                 {formatRupiah(calc.grandTotal)}
               </span>
             </div>
+
+            {/* Framed Info Sisa Pelunasan Box */}
+            <div className="mt-2 p-2 sm:p-2.5 rounded-lg border-2 border-neutral-900 bg-amber-50/80 space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-black uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full border border-neutral-900 ${invoice.paymentStatus === 'paid' ? 'bg-emerald-500' : 'bg-[#FFD400]'}`}></span>
+                  {invoice.paymentStatus === 'paid'
+                    ? 'Status Sisa Pelunasan:'
+                    : invoice.paymentStatus === 'dp_paid'
+                    ? 'Sisa Pelunasan Wajib Dibayar:'
+                    : invoice.paymentScheme !== 'full'
+                    ? 'Sisa Pelunasan (Setelah DP):'
+                    : 'Tagihan Wajib Dibayar:'}
+                </span>
+                <span className={`font-mono text-sm sm:text-base font-black ${invoice.paymentStatus === 'paid' ? 'text-emerald-800' : 'text-neutral-950'}`}>
+                  {invoice.paymentStatus === 'paid'
+                    ? 'Rp 0 (LUNAS)'
+                    : invoice.paymentScheme === 'full'
+                    ? formatRupiah(calc.grandTotal)
+                    : formatRupiah(calc.remainingAmount)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-[9.5px] text-neutral-700 border-t border-neutral-300/80 pt-1">
+                <span className="leading-tight">
+                  {invoice.paymentStatus === 'paid'
+                    ? '✓ Seluruh tagihan proyek telah dibayar lunas 100%.'
+                    : invoice.paymentStatus === 'dp_paid'
+                    ? `*DP (${formatRupiah(calc.dpAmount)}) telah lunas. Klien wajib melunasi sisa tagihan ${formatRupiah(calc.remainingAmount)}.`
+                    : invoice.paymentScheme !== 'full'
+                    ? `*Tahap 1 DP: ${formatRupiah(calc.dpAmount)} | Tahap 2 Sisa Pelunasan: ${formatRupiah(calc.remainingAmount)}`
+                    : '*Pembayaran penuh 100% sebelum serah terima final project.'}
+                </span>
+                {invoice.paymentStatus === 'paid' && invoice.finalReceivedDate && (
+                  <span className="font-mono font-bold text-emerald-800 shrink-0 ml-1">
+                    Lunas: {formatDateIndo(invoice.finalReceivedDate)}
+                  </span>
+                )}
+                {invoice.paymentStatus === 'dp_paid' && invoice.dpReceivedDate && (
+                  <span className="font-mono font-bold text-amber-900 shrink-0 ml-1">
+                    DP: {formatDateIndo(invoice.dpReceivedDate)}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
