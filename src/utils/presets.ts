@@ -54,7 +54,10 @@ export const INITIAL_INVOICE_DATA: InvoiceData = {
     percentage: 11,
   },
   paymentScheme: 'dp_50',
+  customDpAmount: 3400000,
   paymentStatus: 'draft',
+  dpReceivedDate: '',
+  finalReceivedDate: '',
   paymentDetails: {
     bankName: 'Bank BCA',
     bankAccount: '8720-9988-12',
