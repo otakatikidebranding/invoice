@@ -344,7 +344,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
             )}
 
             <div className="flex justify-between items-center py-2.5 border-b-2 border-neutral-950 text-neutral-950 font-bold text-sm">
-              <span className="font-display uppercase tracking-wide">Total Tagihan:</span>
+              <span className="font-display uppercase tracking-wide">Total Project:</span>
               <span className="font-mono text-xl text-neutral-950 font-black">
                 {formatRupiah(calc.grandTotal)}
               </span>
