@@ -14,6 +14,7 @@ import {
   Image as ImageIcon,
   CheckCircle2,
   Coins,
+  CalendarCheck,
 } from 'lucide-react';
 import { InvoiceData, LineItem, PaymentScheme, PaymentStatus } from '../types';
 import { PRESET_SERVICES, ServicePreset } from '../utils/presets';
@@ -774,49 +775,202 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 </div>
               )}
 
-              {/* Payment Status */}
-              <div className="pt-2">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 block mb-1.5">
-                  Status Pembayaran Saat Ini
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'draft', label: 'Draft / Belum Bayar' },
-                    {
-                      id: 'dp_paid',
-                      label:
-                        invoice.paymentScheme === 'dp_custom'
-                          ? `DP Custom Lunas`
-                          : 'DP 50% Lunas',
-                    },
-                    { id: 'paid', label: 'Lunas Penuh (Paid)' },
-                  ].map((status) => {
-                    const isSelected = invoice.paymentStatus === status.id;
-                    let activeClass = 'bg-neutral-950 text-white border-neutral-950 shadow-xs';
-                    if (status.id === 'paid' && isSelected) {
-                      activeClass = 'bg-[#FFD400] text-neutral-950 border-[#E6BE00] font-black shadow-xs';
-                    } else if (status.id === 'dp_paid' && isSelected) {
-                      activeClass = 'bg-neutral-950 text-[#FFD400] border-neutral-950 font-bold shadow-xs';
-                    }
+              {/* Payment Status & Dates Received */}
+              <div className="pt-2 space-y-3">
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 block mb-1.5">
+                    Status Pembayaran Saat Ini
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'draft', label: 'Draft / Belum Bayar' },
+                      {
+                        id: 'dp_paid',
+                        label:
+                          invoice.paymentScheme === 'dp_custom'
+                            ? `DP Custom Lunas`
+                            : 'DP 50% Lunas',
+                      },
+                      { id: 'paid', label: 'Lunas Penuh (Paid)' },
+                    ].map((status) => {
+                      const isSelected = invoice.paymentStatus === status.id;
+                      let activeClass = 'bg-neutral-950 text-white border-neutral-950 shadow-xs';
+                      if (status.id === 'paid' && isSelected) {
+                        activeClass = 'bg-[#FFD400] text-neutral-950 border-[#E6BE00] font-black shadow-xs';
+                      } else if (status.id === 'dp_paid' && isSelected) {
+                        activeClass = 'bg-neutral-950 text-[#FFD400] border-neutral-950 font-bold shadow-xs';
+                      }
 
-                    return (
-                      <button
-                        key={status.id}
-                        type="button"
-                        onClick={() => onChange({ ...invoice, paymentStatus: status.id as PaymentStatus })}
-                        className={`px-3 py-2 text-xs font-bold rounded-lg border transition cursor-pointer flex items-center justify-center gap-1.5 ${
-                          isSelected
-                            ? activeClass
-                            : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
-                        }`}
-                      >
-                        {isSelected && (
-                          <CheckCircle2 className={`w-3.5 h-3.5 ${status.id === 'paid' ? 'text-neutral-950' : 'text-[#FFD400]'}`} />
+                      return (
+                        <button
+                          key={status.id}
+                          type="button"
+                          onClick={() => {
+                            const today = new Date().toISOString().split('T')[0];
+                            const updated = { ...invoice, paymentStatus: status.id as PaymentStatus };
+                            if (status.id === 'dp_paid' && !updated.dpReceivedDate) {
+                              updated.dpReceivedDate = today;
+                            } else if (status.id === 'paid' && !updated.finalReceivedDate) {
+                              updated.finalReceivedDate = today;
+                            }
+                            onChange(updated);
+                          }}
+                          className={`px-3 py-2 text-xs font-bold rounded-lg border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                            isSelected
+                              ? activeClass
+                              : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
+                          }`}
+                        >
+                          {isSelected && (
+                            <CheckCircle2 className={`w-3.5 h-3.5 ${status.id === 'paid' ? 'text-neutral-950' : 'text-[#FFD400]'}`} />
+                          )}
+                          <span>{status.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Tanggal DP & Tanggal Pelunasan Diterima Box */}
+                <div className="p-3.5 bg-white border border-neutral-300 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
+                      <CalendarCheck className="w-4 h-4 text-neutral-800" />
+                      Keterangan Tanggal Pembayaran Diterima
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-medium">
+                      Tercatat di Dokumen Invoice
+                    </span>
+                  </div>
+
+                  {invoice.paymentScheme === 'full' ? (
+                    <div className="space-y-1.5 p-2.5 bg-neutral-50 rounded-lg border border-neutral-200">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-neutral-800 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          Tanggal Pelunasan Penuh Diterima:
+                        </label>
+                        {invoice.finalReceivedDate && (
+                          <button
+                            type="button"
+                            onClick={() => onChange({ ...invoice, finalReceivedDate: '' })}
+                            className="text-[10px] text-red-600 hover:underline cursor-pointer"
+                          >
+                            Hapus Tanggal
+                          </button>
                         )}
-                        <span>{status.label}</span>
-                      </button>
-                    );
-                  })}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          value={invoice.finalReceivedDate || ''}
+                          onChange={(e) => onChange({ ...invoice, finalReceivedDate: e.target.value })}
+                          className="flex-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-300 focus:ring-2 focus:ring-neutral-950 outline-hidden bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => onChange({ ...invoice, finalReceivedDate: new Date().toISOString().split('T')[0] })}
+                          className="px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-800 transition cursor-pointer shrink-0"
+                        >
+                          Hari Ini
+                        </button>
+                      </div>
+                      {invoice.finalReceivedDate && (
+                        <p className="text-[10.5px] text-emerald-700 font-medium flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Lunas penuh pada: <strong>{invoice.finalReceivedDate}</strong>
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Tanggal DP Diterima */}
+                      <div className="space-y-1.5 p-2.5 bg-neutral-50 rounded-lg border border-neutral-200">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-bold text-neutral-800 flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-[#FFD400] border border-neutral-400"></span>
+                            Tanggal DP Diterima:
+                          </label>
+                          {invoice.dpReceivedDate && (
+                            <button
+                              type="button"
+                              onClick={() => onChange({ ...invoice, dpReceivedDate: '' })}
+                              className="text-[10px] text-red-600 hover:underline cursor-pointer"
+                            >
+                              Hapus
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="date"
+                            value={invoice.dpReceivedDate || ''}
+                            onChange={(e) => onChange({ ...invoice, dpReceivedDate: e.target.value })}
+                            className="w-full px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-300 focus:ring-2 focus:ring-neutral-950 outline-hidden bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => onChange({ ...invoice, dpReceivedDate: new Date().toISOString().split('T')[0] })}
+                            className="px-2 py-1.5 text-[10px] font-bold rounded-md bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-800 transition cursor-pointer shrink-0"
+                          >
+                            Hari Ini
+                          </button>
+                        </div>
+                        {invoice.dpReceivedDate ? (
+                          <p className="text-[10px] text-amber-900 font-medium">
+                            ✓ DP dicatat: <strong>{invoice.dpReceivedDate}</strong>
+                          </p>
+                        ) : (
+                          <p className="text-[9.5px] text-neutral-500 italic">
+                            Belum ada tanggal DP dicatat.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Tanggal Pelunasan Sisa Diterima */}
+                      <div className="space-y-1.5 p-2.5 bg-neutral-50 rounded-lg border border-neutral-200">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-bold text-neutral-800 flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Tanggal Pelunasan Sisa:
+                          </label>
+                          {invoice.finalReceivedDate && (
+                            <button
+                              type="button"
+                              onClick={() => onChange({ ...invoice, finalReceivedDate: '' })}
+                              className="text-[10px] text-red-600 hover:underline cursor-pointer"
+                            >
+                              Hapus
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="date"
+                            value={invoice.finalReceivedDate || ''}
+                            onChange={(e) => onChange({ ...invoice, finalReceivedDate: e.target.value })}
+                            className="w-full px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-300 focus:ring-2 focus:ring-neutral-950 outline-hidden bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => onChange({ ...invoice, finalReceivedDate: new Date().toISOString().split('T')[0] })}
+                            className="px-2 py-1.5 text-[10px] font-bold rounded-md bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-800 transition cursor-pointer shrink-0"
+                          >
+                            Hari Ini
+                          </button>
+                        </div>
+                        {invoice.finalReceivedDate ? (
+                          <p className="text-[10px] text-emerald-700 font-medium">
+                            ✓ Pelunasan: <strong>{invoice.finalReceivedDate}</strong>
+                          </p>
+                        ) : (
+                          <p className="text-[9.5px] text-neutral-500 italic">
+                            Belum ada tanggal pelunasan.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
