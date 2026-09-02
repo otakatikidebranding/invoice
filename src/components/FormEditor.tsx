@@ -13,6 +13,7 @@ import {
   Upload,
   Image as ImageIcon,
   CheckCircle2,
+  Coins,
 } from 'lucide-react';
 import { InvoiceData, LineItem, PaymentScheme, PaymentStatus } from '../types';
 import { PRESET_SERVICES, ServicePreset } from '../utils/presets';
@@ -560,64 +561,218 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
             </div>
 
             {/* Scheme Selector */}
-            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-3">
+            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-4">
               <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block">
                 Pilihan Skema Pembayaran
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* 1. DP 50% Standard */}
                 <div
                   onClick={() => onChange({ ...invoice, paymentScheme: 'dp_50' })}
-                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 ${
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between gap-2 ${
                     invoice.paymentScheme === 'dp_50'
                       ? 'border-neutral-950 bg-[#FFD400]/10 shadow-2xs'
                       : 'border-neutral-200 bg-white hover:border-neutral-300'
                   }`}
                 >
-                  <div className="pt-0.5">
+                  <div className="flex items-start gap-2.5">
                     <input
                       type="radio"
                       name="paymentScheme"
                       checked={invoice.paymentScheme === 'dp_50'}
                       onChange={() => {}}
-                      className="accent-neutral-950 w-4 h-4 cursor-pointer"
+                      className="accent-neutral-950 w-4 h-4 cursor-pointer mt-0.5"
                     />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-black text-neutral-950">Sistem DP 50% & Pelunasan</h4>
-                      <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-[#FFD400] text-neutral-950">DP 50%</span>
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-black text-neutral-950">DP 50% Standar</h4>
+                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-[#FFD400] text-neutral-950">
+                          50%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600 mt-1 leading-snug">
+                        DP 50% ({formatRupiah(Math.round(calc.grandTotal * 0.5))}) di awal & pelunasan 50% di akhir.
+                      </p>
                     </div>
-                    <p className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                      Menampilkan nominal DP 50% di awal ({formatRupiah(calc.dpAmount)}) dan sisa pelunasan 50% di akhir.
-                    </p>
                   </div>
                 </div>
 
+                {/* 2. DP Nominal Khusus */}
+                <div
+                  onClick={() => {
+                    const currentCustom =
+                      typeof invoice.customDpAmount === 'number' && invoice.customDpAmount > 0
+                        ? invoice.customDpAmount
+                        : Math.round(calc.grandTotal * 0.5);
+                    onChange({
+                      ...invoice,
+                      paymentScheme: 'dp_custom',
+                      customDpAmount: currentCustom,
+                    });
+                  }}
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between gap-2 ${
+                    invoice.paymentScheme === 'dp_custom'
+                      ? 'border-neutral-950 bg-[#FFD400]/15 shadow-2xs ring-1 ring-neutral-950'
+                      : 'border-neutral-200 bg-white hover:border-neutral-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <input
+                      type="radio"
+                      name="paymentScheme"
+                      checked={invoice.paymentScheme === 'dp_custom'}
+                      onChange={() => {}}
+                      className="accent-neutral-950 w-4 h-4 cursor-pointer mt-0.5"
+                    />
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-black text-neutral-950">DP Nominal Khusus</h4>
+                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-neutral-950 text-[#FFD400]">
+                          Custom DP
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600 mt-1 leading-snug">
+                        Tentukan nominal DP secara manual (input angka bebas/pembulatan khusus).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Full Payment */}
                 <div
                   onClick={() => onChange({ ...invoice, paymentScheme: 'full' })}
-                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 ${
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between gap-2 ${
                     invoice.paymentScheme === 'full'
                       ? 'border-neutral-950 bg-neutral-100 shadow-2xs'
                       : 'border-neutral-200 bg-white hover:border-neutral-300'
                   }`}
                 >
-                  <div className="pt-0.5">
+                  <div className="flex items-start gap-2.5">
                     <input
                       type="radio"
                       name="paymentScheme"
                       checked={invoice.paymentScheme === 'full'}
                       onChange={() => {}}
-                      className="accent-neutral-950 w-4 h-4 cursor-pointer"
+                      className="accent-neutral-950 w-4 h-4 cursor-pointer mt-0.5"
                     />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-neutral-950">Pelunasan Penuh (100%)</h4>
-                    <p className="text-[11px] text-neutral-600 mt-0.5 leading-snug">
-                      Menagih seluruh total pembayaran 100% ({formatRupiah(calc.grandTotal)}).
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs font-black text-neutral-950">Pelunasan Penuh</h4>
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-neutral-200 text-neutral-800">
+                          100%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600 mt-1 leading-snug">
+                        Menagih total pembayaran penuh 100% ({formatRupiah(calc.grandTotal)}).
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Custom DP Nominal Input Box */}
+              {invoice.paymentScheme === 'dp_custom' && (
+                <div className="p-4 bg-white border-2 border-neutral-950 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="text-xs font-black uppercase tracking-wider text-neutral-950 flex items-center gap-1.5">
+                      <Coins className="w-4 h-4 text-neutral-950" />
+                      Nominal DP Manual (Rp)
+                    </label>
+                    <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#FFD400] text-neutral-950 border border-[#E6BE00]">
+                      {calc.dpPercentage.toFixed(1)}% dari Total Tagihan ({formatRupiah(calc.grandTotal)})
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                    <div className="md:col-span-7 relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-500 font-mono">
+                        Rp
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        max={calc.grandTotal}
+                        step="50000"
+                        value={
+                          typeof invoice.customDpAmount === 'number'
+                            ? invoice.customDpAmount
+                            : Math.round(calc.grandTotal * 0.5)
+                        }
+                        onChange={(e) =>
+                          onChange({
+                            ...invoice,
+                            customDpAmount: Math.max(0, parseFloat(e.target.value) || 0),
+                          })
+                        }
+                        className="w-full pl-10 pr-3 py-2.5 text-sm font-mono font-black rounded-lg border-2 border-neutral-950 bg-neutral-50 text-neutral-950 focus:bg-white focus:ring-2 focus:ring-[#FFD400] outline-hidden shadow-2xs"
+                        placeholder="Masukkan nominal DP, misal: 3500000"
+                      />
+                    </div>
+
+                    <div className="md:col-span-5 flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            ...invoice,
+                            customDpAmount: Math.round(calc.grandTotal * 0.5),
+                          })
+                        }
+                        className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 transition cursor-pointer"
+                        title="Set tepat 50%"
+                      >
+                        50% ({formatRupiah(Math.round(calc.grandTotal * 0.5))})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const half = calc.grandTotal * 0.5;
+                          const rounded = Math.ceil(half / 500000) * 500000;
+                          onChange({
+                            ...invoice,
+                            customDpAmount: Math.min(calc.grandTotal, rounded),
+                          });
+                        }}
+                        className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 transition cursor-pointer"
+                        title="Genapkan ke kelipatan 500 ribu"
+                      >
+                        Genapkan 500rb
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const half = calc.grandTotal * 0.5;
+                          const rounded = Math.ceil(half / 1000000) * 1000000;
+                          onChange({
+                            ...invoice,
+                            customDpAmount: Math.min(calc.grandTotal, rounded),
+                          });
+                        }}
+                        className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 transition cursor-pointer"
+                        title="Genapkan ke kelipatan 1 juta"
+                      >
+                        Genapkan 1 Juta
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Realtime DP & Pelunasan summary */}
+                  <div className="p-3 bg-neutral-100 rounded-lg border border-neutral-200 text-xs flex flex-wrap justify-between items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-neutral-600 font-medium">Nominal DP Manual:</span>
+                      <span className="font-mono text-neutral-950 font-black text-sm bg-white px-2.5 py-1 rounded border border-neutral-300">
+                        {formatRupiah(calc.dpAmount)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-neutral-600 font-medium">Sisa Tagihan (Pelunasan):</span>
+                      <span className="font-mono text-neutral-950 font-bold text-sm bg-white px-2.5 py-1 rounded border border-neutral-300">
+                        {formatRupiah(calc.remainingAmount)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Status */}
               <div className="pt-2">
@@ -627,7 +782,13 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { id: 'draft', label: 'Draft / Belum Bayar' },
-                    { id: 'dp_paid', label: 'DP 50% Lunas' },
+                    {
+                      id: 'dp_paid',
+                      label:
+                        invoice.paymentScheme === 'dp_custom'
+                          ? `DP Custom Lunas`
+                          : 'DP 50% Lunas',
+                    },
                     { id: 'paid', label: 'Lunas Penuh (Paid)' },
                   ].map((status) => {
                     const isSelected = invoice.paymentStatus === status.id;
