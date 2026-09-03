@@ -27,14 +27,14 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
     switch (invoice.paymentStatus) {
       case 'paid':
         return (
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#FFD400] text-neutral-950 border border-[#E6BE00] shadow-2xs">
-            <CheckCircle2 className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase bg-emerald-400 text-neutral-950 border border-emerald-600 shadow-2xs">
+            <CheckCircle2 className="w-3 h-3 text-neutral-950" />
             LUNAS (FULLY PAID){invoice.finalReceivedDate ? ` • ${formatDateIndo(invoice.finalReceivedDate)}` : ''}
           </div>
         );
       case 'dp_paid':
         return (
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-neutral-900 text-[#FFD400] border border-neutral-800 shadow-2xs">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-neutral-900 text-[#FFD400] border border-neutral-900 shadow-2xs">
             <Clock className="w-3 h-3 text-[#FFD400]" />
             {invoice.paymentScheme === 'dp_custom'
               ? `DP DIBAYAR (${formatRupiah(calc.dpAmount)})`
@@ -44,8 +44,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         );
       default:
         return (
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-neutral-100 text-neutral-700 border border-neutral-300">
-            <FileCheck className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase bg-[#FFD400] text-neutral-950 border-2 border-neutral-950 shadow-2xs">
+            <FileCheck className="w-3.5 h-3.5 text-neutral-950 stroke-[2.5]" />
             MENUNGGU PEMBAYARAN
           </div>
         );
@@ -273,12 +273,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         <div className="pt-2 border-t border-neutral-300 grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
           {/* Payment Scheme Breakdown Box */}
           <div className="md:col-span-6 space-y-2">
-            <div className="bg-neutral-950 text-neutral-100 p-2.5 sm:p-3 rounded-lg shadow-2xs border border-neutral-900">
-              <div className="flex items-center justify-between pb-1.5 border-b border-neutral-800">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+            <div className="bg-white text-neutral-900 p-2.5 sm:p-3 rounded-lg border-2 border-neutral-950 shadow-2xs">
+              <div className="flex items-center justify-between pb-1.5 border-b border-neutral-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800">
                   Rincian Skema Pembayaran
                 </span>
-                <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-[#FFD400] text-neutral-950">
+                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#FFD400] text-neutral-950 border border-neutral-900">
                   {invoice.paymentScheme === 'dp_50'
                     ? 'SISTEM DP 50%'
                     : invoice.paymentScheme === 'dp_custom'
@@ -288,74 +288,75 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
               </div>
 
               {invoice.paymentScheme === 'dp_50' || invoice.paymentScheme === 'dp_custom' ? (
-                <div className="pt-2 space-y-1 text-[11px]">
+                <div className="pt-2 space-y-1.5 text-[11px]">
                   <div className="flex justify-between items-center">
-                    <span className="text-neutral-300 flex items-center gap-1 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FFD400]"></span>
+                    <span className="text-neutral-700 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#FFD400] border border-neutral-900"></span>
                       {invoice.paymentScheme === 'dp_custom' ? 'Nominal DP (Manual):' : 'Nominal DP 50% (Awal):'}
                     </span>
                     <div className="text-right">
-                      <span className="font-mono font-black text-sm text-[#FFD400]">
+                      <span className="font-mono font-black text-sm text-neutral-950">
                         {formatRupiah(calc.dpAmount)}
                       </span>
                       {invoice.dpReceivedDate && (
-                        <span className="block text-[9px] text-[#FFD400]/90 font-mono">
+                        <span className="block text-[9px] text-amber-900 font-mono font-bold">
                           Diterima: {formatDateIndo(invoice.dpReceivedDate)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center text-neutral-400">
-                    <span className="flex items-center gap-1 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
+                  <div className="flex justify-between items-center text-neutral-700">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
                       Sisa Tagihan (Pelunasan):
                     </span>
                     <div className="text-right">
-                      <span className="font-mono font-bold text-neutral-200">
+                      <span className="font-mono font-black text-sm text-neutral-950">
                         {formatRupiah(calc.remainingAmount)}
                       </span>
                       {invoice.finalReceivedDate && (
-                        <span className="block text-[9px] text-emerald-400 font-mono">
+                        <span className="block text-[9px] text-emerald-700 font-mono font-bold">
                           Lunas: {formatDateIndo(invoice.finalReceivedDate)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="pt-1.5 border-t border-neutral-800 text-[10px] text-neutral-400">
+                  <div className="pt-1.5 border-t border-neutral-200 text-[10px] text-neutral-600">
                     {invoice.paymentStatus === 'paid' ? (
-                      <span className="text-emerald-400 font-bold">
-                        ✓ Tagihan lunas 100%
+                      <span className="text-emerald-700 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Tagihan lunas 100%
                         {invoice.finalReceivedDate ? ` (${formatDateIndo(invoice.finalReceivedDate)})` : ''}
                         {invoice.dpReceivedDate ? ` • DP: ${formatDateIndo(invoice.dpReceivedDate)}` : ''}
                       </span>
                     ) : invoice.paymentStatus === 'dp_paid' ? (
-                      <span className="text-[#FFD400] font-bold">
+                      <span className="text-amber-950 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-300 inline-block leading-tight">
                         ✓ DP ({formatRupiah(calc.dpAmount)}) telah lunas
-                        {invoice.dpReceivedDate ? ` diterima tgl ${formatDateIndo(invoice.dpReceivedDate)}` : ''}. Tagihan saat ini: Sisa Pelunasan {formatRupiah(calc.remainingAmount)}
+                        {invoice.dpReceivedDate ? ` diterima tgl ${formatDateIndo(invoice.dpReceivedDate)}` : ''}. Sisa Pelunasan: {formatRupiah(calc.remainingAmount)}
                       </span>
                     ) : (
-                      <span>
+                      <span className="text-neutral-600 font-medium">
                         *Pekerjaan dimulai setelah transfer DP ({formatRupiah(calc.dpAmount)}) diterima.
                       </span>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="pt-2 space-y-1 text-[11px]">
+                <div className="pt-2 space-y-1.5 text-[11px]">
                   <div className="flex justify-between items-center">
-                    <span className="text-neutral-300">Total Pelunasan 100%:</span>
+                    <span className="text-neutral-700 font-medium">Total Pelunasan 100%:</span>
                     <div className="text-right">
-                      <span className="font-mono font-black text-sm sm:text-base text-[#FFD400]">
+                      <span className="font-mono font-black text-sm sm:text-base text-neutral-950">
                         {formatRupiah(calc.grandTotal)}
                       </span>
                       {invoice.finalReceivedDate && (
-                        <span className="block text-[9px] text-emerald-400 font-mono">
+                        <span className="block text-[9px] text-emerald-700 font-mono font-bold">
                           Lunas: {formatDateIndo(invoice.finalReceivedDate)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <p className="text-[10px] text-neutral-400 pt-0.5">
+                  <p className="text-[10px] text-neutral-600 pt-0.5">
                     {invoice.paymentStatus === 'paid'
                       ? `✓ Pembayaran penuh telah lunas diterima${invoice.finalReceivedDate ? ` pada tanggal ${formatDateIndo(invoice.finalReceivedDate)}` : ''}.`
                       : 'Pembayaran dilakukan penuh 100% sebelum serah terima final project.'}
@@ -402,10 +403,20 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
             </div>
 
             {/* Framed Info Sisa Pelunasan Box */}
-            <div className="mt-2 p-2 sm:p-2.5 rounded-lg border-2 border-neutral-900 bg-amber-50/80 space-y-1">
+            <div
+              className={`mt-2 p-2 sm:p-2.5 rounded-lg border-2 ${
+                invoice.paymentStatus === 'paid'
+                  ? 'border-emerald-700 bg-emerald-50 text-emerald-950'
+                  : 'border-neutral-950 bg-[#FFD400] text-neutral-950 shadow-2xs'
+              } space-y-1`}
+            >
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-black uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full border border-neutral-900 ${invoice.paymentStatus === 'paid' ? 'bg-emerald-500' : 'bg-[#FFD400]'}`}></span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-neutral-950 flex items-center gap-1.5">
+                  <span
+                    className={`w-2 h-2 rounded-full border border-neutral-950 ${
+                      invoice.paymentStatus === 'paid' ? 'bg-emerald-600' : 'bg-neutral-950'
+                    }`}
+                  ></span>
                   {invoice.paymentStatus === 'paid'
                     ? 'Status Sisa Pelunasan:'
                     : invoice.paymentStatus === 'dp_paid'
@@ -414,7 +425,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                     ? 'Sisa Pelunasan (Setelah DP):'
                     : 'Tagihan Wajib Dibayar:'}
                 </span>
-                <span className={`font-mono text-sm sm:text-base font-black ${invoice.paymentStatus === 'paid' ? 'text-emerald-800' : 'text-neutral-950'}`}>
+                <span
+                  className={`font-mono text-sm sm:text-base font-black ${
+                    invoice.paymentStatus === 'paid' ? 'text-emerald-800' : 'text-neutral-950'
+                  }`}
+                >
                   {invoice.paymentStatus === 'paid'
                     ? 'Rp 0 (LUNAS)'
                     : invoice.paymentScheme === 'full'
@@ -422,7 +437,13 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                     : formatRupiah(calc.remainingAmount)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-[9.5px] text-neutral-700 border-t border-neutral-300/80 pt-1">
+              <div
+                className={`flex justify-between items-center text-[9.5px] border-t pt-1 ${
+                  invoice.paymentStatus === 'paid'
+                    ? 'border-emerald-200 text-emerald-900'
+                    : 'border-neutral-950/25 text-neutral-950 font-semibold'
+                }`}
+              >
                 <span className="leading-tight">
                   {invoice.paymentStatus === 'paid'
                     ? '✓ Seluruh tagihan proyek telah dibayar lunas 100%.'
@@ -438,7 +459,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                   </span>
                 )}
                 {invoice.paymentStatus === 'dp_paid' && invoice.dpReceivedDate && (
-                  <span className="font-mono font-bold text-amber-900 shrink-0 ml-1">
+                  <span className="font-mono font-black text-neutral-950 shrink-0 ml-1">
                     DP: {formatDateIndo(invoice.dpReceivedDate)}
                   </span>
                 )}
