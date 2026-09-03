@@ -44,8 +44,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         );
       default:
         return (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase bg-[#FFD400] text-neutral-950 border-2 border-neutral-950 shadow-2xs">
-            <FileCheck className="w-3.5 h-3.5 text-neutral-950 stroke-[2.5]" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase bg-neutral-950 text-[#FFD400] border-2 border-neutral-950 shadow-2xs">
+            <FileCheck className="w-3.5 h-3.5 text-[#FFD400] stroke-[2.5]" />
             MENUNGGU PEMBAYARAN
           </div>
         );
@@ -407,7 +407,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
               className={`mt-2 p-2 sm:p-2.5 rounded-lg border-2 ${
                 invoice.paymentStatus === 'paid'
                   ? 'border-emerald-700 bg-emerald-50 text-emerald-950'
-                  : 'border-neutral-950 bg-[#FFD400] text-neutral-950 shadow-2xs'
+                  : 'border-neutral-950 bg-amber-100 text-neutral-950 shadow-2xs'
               } space-y-1`}
             >
               <div className="flex justify-between items-center">
@@ -441,7 +441,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                 className={`flex justify-between items-center text-[9.5px] border-t pt-1 ${
                   invoice.paymentStatus === 'paid'
                     ? 'border-emerald-200 text-emerald-900'
-                    : 'border-neutral-950/25 text-neutral-950 font-semibold'
+                    : 'border-neutral-950/15 text-neutral-800 font-medium'
                 }`}
               >
                 <span className="leading-tight">
