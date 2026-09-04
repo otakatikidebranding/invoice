@@ -67,3 +67,27 @@ export interface InvoiceData {
   terms: string[];
   currency: string;
 }
+
+export interface SavedInvoice {
+  id: string;
+  invoiceNumber: string;
+  clientName: string;
+  clientCompany?: string;
+  projectSummary?: string;
+  invoiceDate: string;
+  dueDate: string;
+  grandTotal: number;
+  remainingAmount: number;
+  paymentScheme: PaymentScheme;
+  paymentStatus: PaymentStatus;
+  updatedAt: string;
+  data: InvoiceData;
+  syncedToSheetsAt?: string;
+}
+
+export interface GoogleSheetsConfig {
+  spreadsheetId: string;
+  spreadsheetUrl: string;
+  spreadsheetTitle: string;
+  lastSyncedAt?: string;
+}
