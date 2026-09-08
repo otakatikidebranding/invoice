@@ -8,10 +8,10 @@ export const INITIAL_INVOICE_DATA: InvoiceData = {
   studio: {
     name: 'otakatikide',
     tagline: 'Branding & Design Studio',
-    email: 'otakatikide01@gmail.com',
-    phone: '+62 812-3456-7890',
+    email: 'otakatikide.branding@gmail.com',
+    phone: '+62 877-1961-3858',
     portfolio: 'instagram.com/otakatikide',
-    address: 'Jakarta Selatan, DKI Jakarta, Indonesia',
+    address: 'https://otakatikidebranding.github.io/profil/',
     logoText: 'otakatikide',
   },
   client: {
