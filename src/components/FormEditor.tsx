@@ -15,10 +15,14 @@ import {
   CheckCircle2,
   Coins,
   CalendarCheck,
+  Save,
+  RotateCcw,
+  ShieldCheck,
 } from 'lucide-react';
-import { InvoiceData, LineItem, PaymentScheme, PaymentStatus } from '../types';
+import { InvoiceData, LineItem, PaymentScheme, PaymentStatus, StudioInfo } from '../types';
 import { PRESET_SERVICES, ServicePreset } from '../utils/presets';
 import { calculateInvoice, formatRupiah } from '../utils/formatters';
+import { saveStoredStudioProfile, resetStoredStudioProfile } from '../utils/invoiceStorage';
 
 interface FormEditorProps {
   invoice: InvoiceData;
@@ -28,8 +32,41 @@ interface FormEditorProps {
 export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => {
   const [activeTab, setActiveTab] = useState<'client' | 'items' | 'payment' | 'studio' | 'terms'>('items');
   const [showPresetsModal, setShowPresetsModal] = useState(false);
+  const [savedStudioFeedback, setSavedStudioFeedback] = useState(false);
 
   const calc = calculateInvoice(invoice);
+
+  // Studio Profile Handlers
+  const handleUpdateStudio = (field: keyof StudioInfo, value: string) => {
+    const updatedStudio: StudioInfo = {
+      ...invoice.studio,
+      [field]: value,
+    };
+    onChange({
+      ...invoice,
+      studio: updatedStudio,
+    });
+    // Auto-save to localStorage so changes are permanently retained for new invoices
+    saveStoredStudioProfile(updatedStudio);
+  };
+
+  const handleSaveStudioAsDefault = () => {
+    saveStoredStudioProfile(invoice.studio);
+    setSavedStudioFeedback(true);
+    setTimeout(() => setSavedStudioFeedback(false), 3000);
+  };
+
+  const handleResetStudioToDefault = () => {
+    if (window.confirm('Kembalikan data profil studio ke pengaturan bawaan otakatikide?')) {
+      const defaultStudio = resetStoredStudioProfile();
+      onChange({
+        ...invoice,
+        studio: defaultStudio,
+      });
+      setSavedStudioFeedback(true);
+      setTimeout(() => setSavedStudioFeedback(false), 3000);
+    }
+  };
 
   // Line Item Handlers
   const handleAddItem = (preset?: ServicePreset) => {
@@ -1275,11 +1312,57 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
         {/* TAB 5: STUDIO PROFILE */}
         {activeTab === 'studio' && (
           <div className="space-y-4">
-            <div>
-              <h3 className="font-bold text-neutral-950 text-sm">Profil Studio otakatikide</h3>
-              <p className="text-xs text-neutral-500">
-                Informasi identitas studio desain yang tercantum pada kop invoice.
-              </p>
+            {/* Studio Profile Persistence Banner & Actions */}
+            <div className="p-4 bg-neutral-900 text-white rounded-xl border border-neutral-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#FFD400]" />
+                  <h3 className="font-bold text-white text-sm">
+                    Profil Studio otakatikide (Pengaturan Bawaan)
+                  </h3>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Otomatis Tersimpan
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-300 max-w-xl leading-relaxed">
+                  Data profil ini otomatis menjadi identitas kop surat resmi untuk setiap pembuatan invoice baru (<span className="font-bold text-white">+ Baru</span>). Anda tidak perlu mengetiknya ulang setiap kali membuat tagihan baru.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleSaveStudioAsDefault}
+                  className={`px-3.5 py-2 text-xs font-bold rounded-lg transition flex items-center gap-2 cursor-pointer shadow-xs border ${
+                    savedStudioFeedback
+                      ? 'bg-emerald-600 text-white border-emerald-500 ring-2 ring-emerald-400'
+                      : 'bg-[#FFD400] hover:bg-[#E6BE00] active:bg-[#CCAA00] text-neutral-950 border-[#E6BE00]'
+                  }`}
+                  title="Klik untuk memastikan profil ini tersimpan permanen sebagai default"
+                >
+                  {savedStudioFeedback ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                      <span>Tersimpan Sebagai Default!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5 text-neutral-950" />
+                      <span>Simpan Profil Default</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleResetStudioToDefault}
+                  className="px-2.5 py-2 text-xs font-medium rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer border border-neutral-700"
+                  title="Kembalikan data ke standar otakatikide"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Standar</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1290,12 +1373,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="text"
                   value={invoice.studio.name}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, name: e.target.value },
-                    })
-                  }
+                  onChange={(e) => handleUpdateStudio('name', e.target.value)}
+                  placeholder="otakatikide"
                   className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-bold"
                 />
               </div>
@@ -1307,12 +1386,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="text"
                   value={invoice.studio.tagline}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, tagline: e.target.value },
-                    })
-                  }
+                  onChange={(e) => handleUpdateStudio('tagline', e.target.value)}
+                  placeholder="Branding & Design Studio"
                   className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden"
                 />
               </div>
@@ -1324,13 +1399,9 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="email"
                   value={invoice.studio.email}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, email: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden"
+                  onChange={(e) => handleUpdateStudio('email', e.target.value)}
+                  placeholder="otakatikide.branding@gmail.com"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-medium"
                 />
               </div>
 
@@ -1341,13 +1412,9 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="text"
                   value={invoice.studio.phone}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, phone: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-mono"
+                  onChange={(e) => handleUpdateStudio('phone', e.target.value)}
+                  placeholder="+62 877-1961-3858"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-mono font-medium"
                 />
               </div>
 
@@ -1358,12 +1425,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="text"
                   value={invoice.studio.portfolio}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, portfolio: e.target.value },
-                    })
-                  }
+                  onChange={(e) => handleUpdateStudio('portfolio', e.target.value)}
+                  placeholder="instagram.com/otakatikide"
                   className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden"
                 />
               </div>
@@ -1375,13 +1438,9 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                 <input
                   type="text"
                   value={invoice.studio.address}
-                  onChange={(e) =>
-                    onChange({
-                      ...invoice,
-                      studio: { ...invoice.studio, address: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden"
+                  onChange={(e) => handleUpdateStudio('address', e.target.value)}
+                  placeholder="https://otakatikidebranding.github.io/profil/"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-mono text-[11px]"
                 />
               </div>
             </div>
