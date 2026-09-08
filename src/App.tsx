@@ -15,6 +15,7 @@ import {
   deleteSavedInvoiceFromStorage,
   markInvoiceSyncedInStorage,
   generateNextInvoiceNumber,
+  getStoredStudioProfile,
 } from './utils/invoiceStorage';
 import {
   requestGoogleAccessToken,
@@ -50,12 +51,24 @@ export default function App() {
             (t: string) => !t.includes('3x putaran revisi minor')
           );
         }
+        const storedStudio = getStoredStudioProfile();
+        if (
+          !parsed.studio ||
+          parsed.studio.email === 'otakatikide01@gmail.com' ||
+          parsed.studio.phone === '+62 812-3456-7890' ||
+          parsed.studio.address === 'Jakarta Selatan, DKI Jakarta, Indonesia'
+        ) {
+          parsed.studio = storedStudio;
+        }
         return parsed;
       }
     } catch (e) {
       console.warn('Failed to load saved invoice from localStorage:', e);
     }
-    return INITIAL_INVOICE_DATA;
+    return {
+      ...INITIAL_INVOICE_DATA,
+      studio: getStoredStudioProfile(),
+    };
   });
 
   const [mainTab, setMainTab] = useState<'generator' | 'clients'>('generator');
@@ -228,6 +241,7 @@ export default function App() {
 
     const newInvoice: InvoiceData = {
       ...INITIAL_INVOICE_DATA,
+      studio: getStoredStudioProfile(),
       invoiceNumber: nextNumber,
       invoiceDate: today,
       dueDate: nextWeek,
@@ -273,6 +287,7 @@ export default function App() {
 
     const newInvoice: InvoiceData = {
       ...INITIAL_INVOICE_DATA,
+      studio: getStoredStudioProfile(),
       invoiceNumber: nextNumber,
       invoiceDate: today,
       dueDate: nextWeek,
@@ -364,9 +379,12 @@ export default function App() {
   };
 
   const handleReset = () => {
-    if (window.confirm('Apakah Anda yakin ingin me-reset data ke template awal studio otakatikide?')) {
-      setInvoice(INITIAL_INVOICE_DATA);
-      showToast('Data invoice berhasil di-reset.');
+    if (window.confirm('Apakah Anda yakin ingin me-reset data formulir invoice ini? (Profil Studio Anda tetap dipertahankan)')) {
+      setInvoice({
+        ...INITIAL_INVOICE_DATA,
+        studio: getStoredStudioProfile(),
+      });
+      showToast('Formulir di-reset (Profil Studio tetap tersimpan).');
     }
   };
 
