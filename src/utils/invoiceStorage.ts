@@ -1,7 +1,9 @@
-import { InvoiceData, SavedInvoice } from '../types';
+import { InvoiceData, SavedInvoice, StudioInfo } from '../types';
 import { calculateInvoice } from './formatters';
+import { INITIAL_INVOICE_DATA } from './presets';
 
 const STORAGE_KEY = 'otakatikide_saved_invoices';
+const STUDIO_STORAGE_KEY = 'otakatikide_saved_studio_profile';
 
 export function getSavedInvoices(): SavedInvoice[] {
   try {
@@ -118,4 +120,39 @@ export function generateNextInvoiceNumber(existingNumber?: string): string {
 
   const nextSeq = String(highestSequence + 1).padStart(3, '0');
   return `INV/OAI/${year}/${month}/${nextSeq}`;
+}
+
+export function getStoredStudioProfile(): StudioInfo {
+  try {
+    const raw = localStorage.getItem(STUDIO_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && parsed.name) {
+        return {
+          ...INITIAL_INVOICE_DATA.studio,
+          ...parsed,
+        };
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load studio profile from localStorage:', err);
+  }
+  return INITIAL_INVOICE_DATA.studio;
+}
+
+export function saveStoredStudioProfile(studio: StudioInfo): void {
+  try {
+    localStorage.setItem(STUDIO_STORAGE_KEY, JSON.stringify(studio));
+  } catch (err) {
+    console.error('Failed to save studio profile to localStorage:', err);
+  }
+}
+
+export function resetStoredStudioProfile(): StudioInfo {
+  try {
+    localStorage.removeItem(STUDIO_STORAGE_KEY);
+  } catch (err) {
+    console.error('Failed to reset studio profile in localStorage:', err);
+  }
+  return INITIAL_INVOICE_DATA.studio;
 }
