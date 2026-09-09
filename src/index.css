@@ -42,7 +42,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 0mm;
+    margin: 0;
   }
   
   html, body {
@@ -50,6 +50,9 @@
     padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
+    height: 100% !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -63,17 +66,24 @@
   }
 
   .invoice-paper {
-    width: 100% !important;
+    width: 210mm !important;
     max-width: 210mm !important;
-    min-height: 297mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
     margin: 0 auto !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     border: none !important;
-    padding: 15mm !important;
+    padding: 8mm 11mm 6mm 11mm !important;
     page-break-inside: avoid !important;
+    page-break-after: avoid !important;
     break-inside: avoid !important;
+    break-after: avoid !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
   }
 
   .no-print {
