@@ -55,13 +55,13 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
   return (
     <div
       id="invoice-document"
-      className="invoice-paper bg-white text-neutral-900 mx-auto w-full max-w-[800px] p-4 sm:p-5 shadow-xl border border-neutral-200 print-shadow-none print-m-0 rounded-xl print:rounded-none relative flex flex-col justify-between text-xs"
+      className="invoice-paper bg-white text-neutral-900 mx-auto w-full max-w-[800px] p-3.5 sm:p-4.5 shadow-xl border border-neutral-200 print-shadow-none print-m-0 rounded-xl print:rounded-none relative flex flex-col justify-between text-xs"
       style={{ boxSizing: 'border-box' }}
     >
       {/* Top Section */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-2.5 print:space-y-1.5">
         {/* Header: Studio Branding & Title */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b-2 border-neutral-900">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 pb-2.5 print:pb-1.5 border-b-2 border-neutral-900">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
               {/* Geometric Brand Logo Mark */}
@@ -141,8 +141,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         </div>
 
         {/* Client & Billing Info Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div className="bg-neutral-50 p-2.5 sm:p-3 rounded-lg border border-neutral-200/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 print:gap-1.5">
+          <div className="bg-neutral-50 p-2 sm:p-2.5 print:p-2 rounded-lg border border-neutral-200/80">
             <span className="text-[9.5px] font-bold tracking-wider uppercase text-neutral-500 flex items-center gap-1 mb-1">
               <Building2 className="w-3 h-3 text-neutral-600" />
               Ditujukan Kepada (Klien):
@@ -157,31 +157,31 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                 </p>
               )}
               {invoice.client.whatsapp && (
-                <p className="text-[10.5px] text-neutral-600 flex items-center gap-1">
+                <p className="text-[10px] sm:text-[10.5px] text-neutral-600 flex items-center gap-1">
                   <span className="text-neutral-500">WhatsApp:</span>
                   <span className="font-mono">{invoice.client.whatsapp}</span>
                 </p>
               )}
               {invoice.client.email && (
-                <p className="text-[10.5px] text-neutral-600">
+                <p className="text-[10px] sm:text-[10.5px] text-neutral-600">
                   <span className="text-neutral-500">Email:</span> {invoice.client.email}
                 </p>
               )}
               {invoice.client.address && (
-                <p className="text-[10px] text-neutral-600 pt-0.5 leading-tight">
+                <p className="text-[9.5px] sm:text-[10px] text-neutral-600 pt-0.5 leading-tight">
                   {invoice.client.address}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="bg-neutral-50 p-2.5 sm:p-3 rounded-lg border border-neutral-200/80 flex flex-col justify-between">
+          <div className="bg-neutral-50 p-2 sm:p-2.5 print:p-2 rounded-lg border border-neutral-200/80 flex flex-col justify-between">
             <div>
               <span className="text-[9.5px] font-bold tracking-wider uppercase text-neutral-500 flex items-center gap-1 mb-1">
                 <Calendar className="w-3 h-3 text-neutral-600" />
                 Ketentuan Pembayaran Proyek:
               </span>
-              <div className="space-y-1 text-[11px] text-neutral-700">
+              <div className="space-y-0.5 sm:space-y-1 text-[10.5px] sm:text-[11px] text-neutral-700">
                 <div className="flex justify-between items-center py-0.5 border-b border-neutral-200/60">
                   <span className="text-neutral-600">Skema:</span>
                   <span className="font-bold text-neutral-900">
@@ -219,7 +219,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
               </div>
             </div>
 
-            <div className="pt-1 text-[9.5px] text-neutral-500 italic">
+            <div className="pt-0.5 text-[9px] sm:text-[9.5px] text-neutral-500 italic">
               *Master file & hak cipta diserahkan penuh setelah pelunasan 100%.
             </div>
           </div>
@@ -270,11 +270,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         </div>
 
         {/* Calculation & Summary Area */}
-        <div className="pt-2 border-t border-neutral-300 grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+        <div className="pt-1.5 print:pt-1 border-t border-neutral-300 grid grid-cols-1 md:grid-cols-12 gap-2.5 print:gap-1.5 items-start">
           {/* Payment Scheme Breakdown Box */}
-          <div className="md:col-span-6 space-y-2">
-            <div className="bg-white text-neutral-900 p-2.5 sm:p-3 rounded-lg border-2 border-neutral-950 shadow-2xs">
-              <div className="flex items-center justify-between pb-1.5 border-b border-neutral-200">
+          <div className="md:col-span-6 space-y-1.5">
+            <div className="bg-white text-neutral-900 p-2 sm:p-2.5 print:p-1.5 rounded-lg border-2 border-neutral-950 shadow-2xs">
+              <div className="flex items-center justify-between pb-1 border-b border-neutral-200">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800">
                   Rincian Skema Pembayaran
                 </span>
@@ -403,7 +403,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
             </div>
 
             {/* Framed Info Sisa Pelunasan Box */}
-            <div className="mt-2 p-2 sm:p-2.5 rounded-lg border-2 border-neutral-950 bg-amber-100 text-neutral-950 shadow-2xs space-y-1">
+            <div className="mt-1.5 print:mt-1 p-2 print:p-1.5 rounded-lg border-2 border-neutral-950 bg-amber-100 text-neutral-950 shadow-2xs space-y-0.5">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-black uppercase tracking-wider text-neutral-950 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full border border-neutral-950 bg-neutral-950"></span>
@@ -423,14 +423,14 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                     : formatRupiah(calc.remainingAmount)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-[9.5px] border-t border-neutral-950/15 text-neutral-800 font-medium pt-1">
+              <div className="flex justify-between items-center text-[9px] sm:text-[9.5px] border-t border-neutral-950/15 text-neutral-800 font-medium pt-0.5">
                 <span className="leading-tight">
                   {invoice.paymentStatus === 'paid'
                     ? '✓ Seluruh tagihan proyek telah dibayar lunas 100%.'
                     : invoice.paymentStatus === 'dp_paid'
                     ? `*DP (${formatRupiah(calc.dpAmount)}) telah lunas. Klien wajib melunasi sisa tagihan ${formatRupiah(calc.remainingAmount)}.`
                     : invoice.paymentScheme !== 'full'
-                    ? `*Tahap 1 DP: ${formatRupiah(calc.dpAmount)} | Tahap 2 Sisa Pelunasan: ${formatRupiah(calc.remainingAmount)}`
+                    ? `*Tahap 1 DP: ${formatRupiah(calc.dpAmount)} | Tahap 2 Sisa: ${formatRupiah(calc.remainingAmount)}`
                     : '*Pembayaran penuh 100% sebelum serah terima final project.'}
                 </span>
                 {invoice.paymentStatus === 'paid' && invoice.finalReceivedDate && (
@@ -449,15 +449,15 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         </div>
 
         {/* Payment Methods Section (Bank BCA & QRIS) */}
-        <div className="pt-2 border-t border-neutral-200">
-          <h4 className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 mb-1.5 flex items-center gap-1">
+        <div className="pt-1.5 print:pt-1 border-t border-neutral-200">
+          <h4 className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 mb-1 print:mb-0.5 flex items-center gap-1">
             <CreditCard className="w-3 h-3 text-neutral-700" />
             Instruksi Pembayaran Resmi (Payment Details)
           </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 print:gap-1.5">
             {/* Bank BCA Card */}
-            <div className="p-2.5 bg-neutral-50 rounded-lg border border-neutral-200 space-y-1">
+            <div className="p-2 sm:p-2.5 print:p-1.5 bg-neutral-50 rounded-lg border border-neutral-200 space-y-0.5">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-wider text-neutral-950 bg-[#FFD400] px-2 py-0.2 rounded border border-[#E6BE00]">
                   {invoice.paymentDetails.bankName || 'Bank BCA'}
@@ -465,7 +465,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                 <span className="text-[9px] text-neutral-500 font-semibold uppercase">Transfer Bank</span>
               </div>
               <div className="pt-0.5">
-                <span className="text-[9px] text-neutral-500 uppercase font-bold block">
+                <span className="text-[8.5px] sm:text-[9px] text-neutral-500 uppercase font-bold block">
                   Nomor Rekening:
                 </span>
                 <p className="font-mono text-sm sm:text-base font-black text-neutral-950 tracking-wider leading-tight">
@@ -473,7 +473,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                 </p>
               </div>
               <div>
-                <span className="text-[9px] text-neutral-500 uppercase font-semibold">
+                <span className="text-[8.5px] sm:text-[9px] text-neutral-500 uppercase font-semibold">
                   A.N: <strong className="text-neutral-800">{invoice.paymentDetails.accountHolder || 'OTAKATIKIDE STUDIO'}</strong>
                 </span>
               </div>
@@ -481,8 +481,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
 
             {/* QRIS Card */}
             {invoice.paymentDetails.showQris && (
-              <div className="p-2.5 bg-neutral-50 rounded-lg border border-neutral-200 flex items-center gap-2.5">
-                <div className="w-14 h-14 bg-white p-1 rounded-md border border-neutral-300 flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="p-2 sm:p-2.5 print:p-1.5 bg-neutral-50 rounded-lg border border-neutral-200 flex items-center gap-2 print:gap-1.5">
+                <div className="w-12 h-12 print:w-10 print:h-10 bg-white p-1 rounded-md border border-neutral-300 flex items-center justify-center shrink-0 shadow-2xs">
                   {invoice.paymentDetails.qrisImageUrl ? (
                     <img
                       src={invoice.paymentDetails.qrisImageUrl}
@@ -492,19 +492,19 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
                   ) : (
                     /* Elegant SVG Fallback QRIS Preview */
                     <div className="w-full h-full bg-neutral-950 text-white rounded p-0.5 flex flex-col items-center justify-center">
-                      <QrCode className="w-7 h-7 text-[#FFD400]" />
+                      <QrCode className="w-6 h-6 print:w-5 print:h-5 text-[#FFD400]" />
                       <span className="text-[6px] font-black tracking-tighter text-white">QRIS</span>
                     </div>
                   )}
                 </div>
                 <div className="space-y-0.5">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-900 bg-neutral-200 px-1.5 py-0.2 rounded border border-neutral-300 inline-block">
+                  <span className="text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider text-neutral-900 bg-neutral-200 px-1.5 py-0.2 rounded border border-neutral-300 inline-block">
                     QRIS Universal
                   </span>
-                  <p className="text-[10px] text-neutral-700 font-medium leading-tight">
+                  <p className="text-[9.5px] sm:text-[10px] text-neutral-700 font-medium leading-tight">
                     {invoice.paymentDetails.qrisNotes || 'Mendukung BCA, Livin, GoPay, OVO, ShopeePay, DANA & Semua E-Wallet'}
                   </p>
-                  <p className="text-[9px] text-neutral-500">
+                  <p className="text-[8.5px] sm:text-[9px] text-neutral-500">
                     Scan via aplikasi m-Banking/e-wallet Anda.
                   </p>
                 </div>
@@ -514,17 +514,17 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
         </div>
 
         {/* Notes & Terms Section */}
-        <div className="pt-2 border-t border-neutral-200 space-y-1.5">
+        <div className="pt-1.5 print:pt-1 border-t border-neutral-200 space-y-1 print:space-y-0.5">
           {invoice.notes && (
-            <div className="text-[10.5px] bg-neutral-100/70 p-2 rounded-lg border border-neutral-200">
+            <div className="text-[10px] sm:text-[10.5px] bg-neutral-100/70 p-1.5 sm:p-2 print:p-1 rounded-lg border border-neutral-200">
               <span className="font-bold text-neutral-800">Catatan Khusus: </span>
               <span className="text-neutral-700">{invoice.notes}</span>
             </div>
           )}
 
           {invoice.terms && invoice.terms.length > 0 && (
-            <div className="space-y-0.5 text-[10px] text-neutral-600">
-              <span className="font-bold uppercase tracking-wider text-neutral-700 text-[9.5px] block">
+            <div className="space-y-0.5 text-[9.5px] sm:text-[10px] text-neutral-600">
+              <span className="font-bold uppercase tracking-wider text-neutral-700 text-[9px] sm:text-[9.5px] block">
                 Syarat & Ketentuan (Terms & Conditions):
               </span>
               <ul className="list-disc list-inside space-y-0.5 text-neutral-600 pl-0.5 leading-snug">
@@ -538,21 +538,21 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({ invoice }) => {
       </div>
 
       {/* Footer / Signature / Brand Tag */}
-      <div className="pt-2.5 border-t border-neutral-300 mt-2 flex flex-col sm:flex-row justify-between items-end gap-2 text-[10px] text-neutral-500">
+      <div className="pt-1.5 print:pt-1 border-t border-neutral-300 mt-1.5 print:mt-1 flex flex-col sm:flex-row justify-between items-end gap-2 text-[9.5px] sm:text-[10px] text-neutral-500">
         <div>
           <p className="font-display font-bold text-neutral-900 text-xs">
             {invoice.studio.name}
           </p>
-          <p className="text-[9.5px] text-neutral-500">
+          <p className="text-[9px] sm:text-[9.5px] text-neutral-500">
             {invoice.studio.tagline} • Crafted with precision & creative excellence.
           </p>
         </div>
 
         <div className="text-left sm:text-right space-y-0.5">
-          <p className="text-[9.5px] text-neutral-500">
+          <p className="text-[9px] sm:text-[9.5px] text-neutral-500">
             Diterbitkan oleh Manajemen {invoice.studio.name}
           </p>
-          <div className="font-mono text-[9px] text-neutral-400">
+          <div className="font-mono text-[8.5px] sm:text-[9px] text-neutral-400">
             Dokumen sah tanpa tanda tangan basah • ID: {invoice.invoiceNumber}
           </div>
         </div>
