@@ -32,27 +32,21 @@ export async function exportInvoiceToPdf(elementId: string, filename: string): P
     const pdfWidth = 210;
     const pdfHeight = 297;
     
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    // Scale accurately to fit perfectly on 1 standard A4 sheet
+    let finalWidth = pdfWidth;
+    let finalHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    // If height fits within single A4 page or needs slight vertical adjustment
-    if (imgHeight <= pdfHeight) {
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-    } else {
-      // Multi-page handling if invoice has dozens of line items
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= pdfHeight;
-      }
+    // If finalHeight exceeds A4 height by any amount, scale proportionally to fit 1 page
+    if (finalHeight > pdfHeight) {
+      const scaleRatio = pdfHeight / finalHeight;
+      finalHeight = pdfHeight;
+      finalWidth = pdfWidth * scaleRatio;
     }
+
+    const xOffset = (pdfWidth - finalWidth) / 2;
+    const yOffset = (pdfHeight - finalHeight) / 2;
+
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
 
     const sanitizedFilename = (filename || 'Invoice-otakatikide')
       .replace(/[/\\?%*:|"<>]/g, '-')
