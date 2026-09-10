@@ -19,10 +19,15 @@ import {
   RotateCcw,
   ShieldCheck,
 } from 'lucide-react';
-import { InvoiceData, LineItem, PaymentScheme, PaymentStatus, StudioInfo } from '../types';
+import { InvoiceData, LineItem, PaymentScheme, PaymentStatus, StudioInfo, PaymentDetails } from '../types';
 import { PRESET_SERVICES, ServicePreset } from '../utils/presets';
 import { calculateInvoice, formatRupiah } from '../utils/formatters';
-import { saveStoredStudioProfile, resetStoredStudioProfile } from '../utils/invoiceStorage';
+import {
+  saveStoredStudioProfile,
+  resetStoredStudioProfile,
+  saveStoredPaymentDetails,
+  resetStoredPaymentDetails,
+} from '../utils/invoiceStorage';
 
 interface FormEditorProps {
   invoice: InvoiceData;
@@ -33,6 +38,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
   const [activeTab, setActiveTab] = useState<'client' | 'items' | 'payment' | 'studio' | 'terms'>('items');
   const [showPresetsModal, setShowPresetsModal] = useState(false);
   const [savedStudioFeedback, setSavedStudioFeedback] = useState(false);
+  const [savedPaymentFeedback, setSavedPaymentFeedback] = useState(false);
 
   const calc = calculateInvoice(invoice);
 
@@ -66,6 +72,50 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
       setSavedStudioFeedback(true);
       setTimeout(() => setSavedStudioFeedback(false), 3000);
     }
+  };
+
+  // Payment Details Handlers
+  const handleUpdatePayment = <K extends keyof PaymentDetails>(field: K, value: PaymentDetails[K]) => {
+    const updatedPayment: PaymentDetails = {
+      ...invoice.paymentDetails,
+      [field]: value,
+    };
+    onChange({
+      ...invoice,
+      paymentDetails: updatedPayment,
+    });
+    // Auto-save so changes are permanently retained for new invoices
+    saveStoredPaymentDetails(updatedPayment);
+  };
+
+  const handleSavePaymentAsDefault = () => {
+    saveStoredPaymentDetails(invoice.paymentDetails);
+    setSavedPaymentFeedback(true);
+    setTimeout(() => setSavedPaymentFeedback(false), 3000);
+  };
+
+  const handleResetPaymentToDefault = () => {
+    if (window.confirm('Kembalikan informasi rekening Bank BCA & QRIS ke pengaturan bawaan otakatikide?')) {
+      const defaultPayment = resetStoredPaymentDetails();
+      onChange({
+        ...invoice,
+        paymentDetails: defaultPayment,
+      });
+      setSavedPaymentFeedback(true);
+      setTimeout(() => setSavedPaymentFeedback(false), 3000);
+    }
+  };
+
+  const handleResetQrisImage = () => {
+    const updatedPayment: PaymentDetails = {
+      ...invoice.paymentDetails,
+      qrisImageUrl: '',
+    };
+    onChange({
+      ...invoice,
+      paymentDetails: updatedPayment,
+    });
+    saveStoredPaymentDetails(updatedPayment);
   };
 
   // Line Item Handlers
@@ -120,14 +170,16 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
+        const updatedPayment: PaymentDetails = {
+          ...invoice.paymentDetails,
+          qrisImageUrl: reader.result as string,
+          showQris: true,
+        };
         onChange({
           ...invoice,
-          paymentDetails: {
-            ...invoice.paymentDetails,
-            qrisImageUrl: reader.result as string,
-            showQris: true,
-          },
+          paymentDetails: updatedPayment,
         });
+        saveStoredPaymentDetails(updatedPayment);
       };
       reader.readAsDataURL(file);
     }
@@ -1120,10 +1172,53 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
 
             {/* Bank BCA & QRIS Payment Settings */}
             <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-neutral-700" />
-                Informasi Rekening Bank BCA & QRIS
-              </h4>
+              {/* Persistence Banner & Actions (Bawaan & Simpan Default) */}
+              <div className="p-3 sm:px-4 sm:py-3 bg-neutral-900 text-white rounded-xl border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <ShieldCheck className="w-4 h-4 text-[#FFD400]" />
+                  <h3 className="font-bold text-white text-sm">
+                    Pengaturan Rekening BCA & QRIS (Pengaturan Bawaan)
+                  </h3>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Otomatis Tersimpan
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleSavePaymentAsDefault}
+                    className={`px-3.5 py-2 text-xs font-bold rounded-lg transition flex items-center gap-2 cursor-pointer shadow-xs border ${
+                      savedPaymentFeedback
+                        ? 'bg-emerald-600 text-white border-emerald-500 ring-2 ring-emerald-400'
+                        : 'bg-[#FFD400] hover:bg-[#E6BE00] active:bg-[#CCAA00] text-neutral-950 border-[#E6BE00]'
+                    }`}
+                    title="Klik untuk memastikan data rekening BCA & QRIS ini tersimpan permanen sebagai default"
+                  >
+                    {savedPaymentFeedback ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                        <span>Tersimpan Sebagai Default!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5 text-neutral-950" />
+                        <span>Simpan Rekening Default</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResetPaymentToDefault}
+                    className="px-2.5 py-2 text-xs font-medium rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer border border-neutral-700"
+                    title="Kembalikan data rekening ke standar otakatikide"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Standar</span>
+                  </button>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1">
@@ -1131,15 +1226,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                   <input
                     type="text"
                     value={invoice.paymentDetails.bankName}
-                    onChange={(e) =>
-                      onChange({
-                        ...invoice,
-                        paymentDetails: {
-                          ...invoice.paymentDetails,
-                          bankName: e.target.value,
-                        },
-                      })
-                    }
+                    onChange={(e) => handleUpdatePayment('bankName', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-medium"
                     placeholder="Bank BCA"
                   />
@@ -1152,15 +1239,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                   <input
                     type="text"
                     value={invoice.paymentDetails.bankAccount}
-                    onChange={(e) =>
-                      onChange({
-                        ...invoice,
-                        paymentDetails: {
-                          ...invoice.paymentDetails,
-                          bankAccount: e.target.value,
-                        },
-                      })
-                    }
+                    onChange={(e) => handleUpdatePayment('bankAccount', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono font-bold rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden text-neutral-900"
                     placeholder="8720-9988-12"
                   />
@@ -1171,15 +1250,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                   <input
                     type="text"
                     value={invoice.paymentDetails.accountHolder}
-                    onChange={(e) =>
-                      onChange({
-                        ...invoice,
-                        paymentDetails: {
-                          ...invoice.paymentDetails,
-                          accountHolder: e.target.value,
-                        },
-                      })
-                    }
+                    onChange={(e) => handleUpdatePayment('accountHolder', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-neutral-300 bg-white focus:ring-2 focus:ring-neutral-900/10 outline-hidden font-medium"
                     placeholder="OTAKATIKIDE STUDIO"
                   />
@@ -1193,16 +1264,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                     type="checkbox"
                     id="showQrisToggle"
                     checked={invoice.paymentDetails.showQris}
-                    onChange={(e) =>
-                      onChange({
-                        ...invoice,
-                        paymentDetails: {
-                          ...invoice.paymentDetails,
-                          showQris: e.target.checked,
-                        },
-                      })
-                    }
-                    className="w-4 h-4 rounded text-neutral-900"
+                    onChange={(e) => handleUpdatePayment('showQris', e.target.checked)}
+                    className="w-4 h-4 rounded text-neutral-900 accent-neutral-950 cursor-pointer"
                   />
                   <label htmlFor="showQrisToggle" className="text-xs font-bold text-neutral-800 cursor-pointer">
                     Tampilkan Kotak QRIS di Invoice
@@ -1224,16 +1287,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ invoice, onChange }) => 
                     {invoice.paymentDetails.qrisImageUrl && (
                       <button
                         type="button"
-                        onClick={() =>
-                          onChange({
-                            ...invoice,
-                            paymentDetails: {
-                              ...invoice.paymentDetails,
-                              qrisImageUrl: '',
-                            },
-                          })
-                        }
-                        className="text-[11px] text-rose-600 hover:underline"
+                        onClick={handleResetQrisImage}
+                        className="text-[11px] text-rose-600 hover:underline cursor-pointer"
                       >
                         Reset ke QRIS Bawaan
                       </button>
