@@ -16,6 +16,7 @@ import {
   markInvoiceSyncedInStorage,
   generateNextInvoiceNumber,
   getStoredStudioProfile,
+  getStoredPaymentDetails,
 } from './utils/invoiceStorage';
 import {
   requestGoogleAccessToken,
@@ -52,6 +53,7 @@ export default function App() {
           );
         }
         const storedStudio = getStoredStudioProfile();
+        const storedPayment = getStoredPaymentDetails();
         if (
           !parsed.studio ||
           parsed.studio.email === 'otakatikide01@gmail.com' ||
@@ -59,6 +61,9 @@ export default function App() {
           parsed.studio.address === 'Jakarta Selatan, DKI Jakarta, Indonesia'
         ) {
           parsed.studio = storedStudio;
+        }
+        if (!parsed.paymentDetails) {
+          parsed.paymentDetails = storedPayment;
         }
         return parsed;
       }
@@ -68,6 +73,7 @@ export default function App() {
     return {
       ...INITIAL_INVOICE_DATA,
       studio: getStoredStudioProfile(),
+      paymentDetails: getStoredPaymentDetails(),
     };
   });
 
@@ -242,6 +248,7 @@ export default function App() {
     const newInvoice: InvoiceData = {
       ...INITIAL_INVOICE_DATA,
       studio: getStoredStudioProfile(),
+      paymentDetails: getStoredPaymentDetails(),
       invoiceNumber: nextNumber,
       invoiceDate: today,
       dueDate: nextWeek,
