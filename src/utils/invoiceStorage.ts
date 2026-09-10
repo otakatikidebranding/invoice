@@ -1,9 +1,10 @@
-import { InvoiceData, SavedInvoice, StudioInfo } from '../types';
+import { InvoiceData, SavedInvoice, StudioInfo, PaymentDetails } from '../types';
 import { calculateInvoice } from './formatters';
 import { INITIAL_INVOICE_DATA } from './presets';
 
 const STORAGE_KEY = 'otakatikide_saved_invoices';
 const STUDIO_STORAGE_KEY = 'otakatikide_saved_studio_profile';
+const PAYMENT_STORAGE_KEY = 'otakatikide_saved_payment_details';
 
 export function getSavedInvoices(): SavedInvoice[] {
   try {
@@ -155,4 +156,39 @@ export function resetStoredStudioProfile(): StudioInfo {
     console.error('Failed to reset studio profile in localStorage:', err);
   }
   return INITIAL_INVOICE_DATA.studio;
+}
+
+export function getStoredPaymentDetails(): PaymentDetails {
+  try {
+    const raw = localStorage.getItem(PAYMENT_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return {
+          ...INITIAL_INVOICE_DATA.paymentDetails,
+          ...parsed,
+        };
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load payment details from localStorage:', err);
+  }
+  return INITIAL_INVOICE_DATA.paymentDetails;
+}
+
+export function saveStoredPaymentDetails(paymentDetails: PaymentDetails): void {
+  try {
+    localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentDetails));
+  } catch (err) {
+    console.error('Failed to save payment details to localStorage:', err);
+  }
+}
+
+export function resetStoredPaymentDetails(): PaymentDetails {
+  try {
+    localStorage.removeItem(PAYMENT_STORAGE_KEY);
+  } catch (err) {
+    console.error('Failed to reset payment details in localStorage:', err);
+  }
+  return INITIAL_INVOICE_DATA.paymentDetails;
 }
