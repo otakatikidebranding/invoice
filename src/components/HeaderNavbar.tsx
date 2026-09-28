@@ -8,7 +8,6 @@ import {
   Eye,
   RotateCcw,
   Sparkles,
-  Check,
   FolderArchive,
   Save,
   Plus,
@@ -17,15 +16,19 @@ import {
   RefreshCw,
   Users,
   Receipt,
+  FileText,
+  ArrowRight,
 } from 'lucide-react';
 import { GoogleSheetsConfig } from '../types';
 
 interface HeaderNavbarProps {
-  activeTab: 'generator' | 'clients';
-  onActiveTabChange: (tab: 'generator' | 'clients') => void;
+  activeTab: 'generator' | 'quotation' | 'clients';
+  onActiveTabChange: (tab: 'generator' | 'quotation' | 'clients') => void;
   clientCount: number;
+  quotationCount: number;
   viewMode: 'split' | 'editor' | 'preview';
   onViewModeChange: (mode: 'split' | 'editor' | 'preview') => void;
+  // Invoice actions
   onOpenWhatsApp: () => void;
   onDownloadPdf: () => void;
   onPrint: () => void;
@@ -39,12 +42,19 @@ interface HeaderNavbarProps {
   onCreateNewInvoice: () => void;
   isSyncingSheets: boolean;
   sheetsConfig: GoogleSheetsConfig | null;
+  // Quotation actions
+  onOpenQuotationWhatsApp?: () => void;
+  onDownloadQuotationPdf?: () => void;
+  onOpenSavedQuotationsModal?: () => void;
+  onCreateNewQuotation?: () => void;
+  onConvertToInvoice?: () => void;
 }
 
 export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   activeTab,
   onActiveTabChange,
   clientCount,
+  quotationCount,
   viewMode,
   onViewModeChange,
   onOpenWhatsApp,
@@ -60,11 +70,16 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   onCreateNewInvoice,
   isSyncingSheets,
   sheetsConfig,
+  onOpenQuotationWhatsApp,
+  onDownloadQuotationPdf,
+  onOpenSavedQuotationsModal,
+  onCreateNewQuotation,
+  onConvertToInvoice,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200 px-4 lg:px-8 py-2.5 no-print shadow-2xs">
       <div className="max-w-7xl mx-auto flex flex-col xl:flex-row items-center justify-between gap-3">
-        {/* Left: Brand / Studio Identity & Storage Quick Actions */}
+        {/* Left: Brand / Studio Identity & Tab Navigation */}
         <div className="flex items-center gap-3 w-full xl:w-auto justify-between xl:justify-start flex-wrap">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-neutral-950 text-white flex items-center justify-center font-display font-black text-base tracking-tighter shadow-xs relative overflow-hidden border border-neutral-800">
@@ -77,18 +92,18 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   otakatikide
                 </span>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFD400]/20 text-neutral-900 border border-[#FFD400]/50">
-                  Invoice App
+                  Studio App
                 </span>
               </div>
               <p className="text-[11px] text-neutral-500 hidden sm:block">
-                Branding & Design Studio • Generator & Rekap Tagihan
+                Branding & Design Studio • Invoice & Surat Penawaran
               </p>
             </div>
           </div>
 
           <div className="h-5 w-px bg-neutral-200 hidden md:block"></div>
 
-          {/* Primary View Switcher: Invoice Generator vs Arsip Klien */}
+          {/* Primary View Switcher: Invoice vs Surat Penawaran vs Arsip Klien */}
           <div className="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200 text-xs">
             <button
               type="button"
@@ -101,6 +116,28 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             >
               <Receipt className={`w-3.5 h-3.5 ${activeTab === 'generator' ? 'text-[#FFD400]' : ''}`} />
               <span>Editor Invoice</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onActiveTabChange('quotation')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
+                activeTab === 'quotation'
+                  ? 'bg-neutral-950 text-white shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-950'
+              }`}
+            >
+              <FileText className={`w-3.5 h-3.5 ${activeTab === 'quotation' ? 'text-[#FFD400]' : ''}`} />
+              <span>Surat Penawaran</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  activeTab === 'quotation'
+                    ? 'bg-[#FFD400] text-neutral-950'
+                    : 'bg-neutral-200 text-neutral-700'
+                }`}
+              >
+                {quotationCount}
+              </span>
             </button>
 
             <button
@@ -126,50 +163,83 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             </button>
           </div>
 
-          {/* Quick Storage Actions */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button
-              type="button"
-              onClick={onOpenSavedModal}
-              title="Lihat riwayat dan daftar invoice tersimpan"
-              className="px-2.5 py-1.5 rounded-xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
-            >
-              <FolderArchive className="w-3.5 h-3.5 text-neutral-700" />
-              <span className="hidden md:inline">Riwayat</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-neutral-950 text-white text-[10px] font-mono font-bold">
-                {savedCount}
-              </span>
-            </button>
+          {/* Quick Storage Actions (Contextual per tab) */}
+          {activeTab === 'generator' && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={onOpenSavedModal}
+                title="Lihat riwayat dan daftar invoice tersimpan"
+                className="px-2.5 py-1.5 rounded-xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+              >
+                <FolderArchive className="w-3.5 h-3.5 text-neutral-700" />
+                <span className="hidden md:inline">Riwayat</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-neutral-950 text-white text-[10px] font-mono font-bold">
+                  {savedCount}
+                </span>
+              </button>
 
-            <button
-              type="button"
-              onClick={onSyncToSheets}
-              disabled={isSyncingSheets}
-              title="Simpan atau sinkronkan data invoice ke Google Sheets"
-              className="px-2.5 py-1.5 rounded-xl border border-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs disabled:opacity-60"
-            >
-              {isSyncingSheets ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-700" />
-              ) : (
-                <Table className="w-3.5 h-3.5 text-emerald-700" />
+              <button
+                type="button"
+                onClick={onSyncToSheets}
+                disabled={isSyncingSheets}
+                title="Simpan atau sinkronkan data invoice ke Google Sheets"
+                className="px-2.5 py-1.5 rounded-xl border border-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs disabled:opacity-60"
+              >
+                {isSyncingSheets ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-700" />
+                ) : (
+                  <Table className="w-3.5 h-3.5 text-emerald-700" />
+                )}
+                <span className="hidden sm:inline">{isSyncingSheets ? 'Menyimpan...' : 'Ke Sheets'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onCreateNewInvoice}
+                title="Buat invoice baru dengan nomor urut selanjutnya"
+                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs"
+              >
+                <Plus className="w-3.5 h-3.5 text-[#FFD400]" />
+                <span className="hidden sm:inline">+ Invoice Baru</span>
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'quotation' && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {onOpenSavedQuotationsModal && (
+                <button
+                  type="button"
+                  onClick={onOpenSavedQuotationsModal}
+                  title="Lihat riwayat dan daftar surat penawaran tersimpan"
+                  className="px-2.5 py-1.5 rounded-xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                >
+                  <FolderArchive className="w-3.5 h-3.5 text-neutral-700" />
+                  <span className="hidden md:inline">Riwayat SPH</span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-neutral-950 text-white text-[10px] font-mono font-bold">
+                    {quotationCount}
+                  </span>
+                </button>
               )}
-              <span className="hidden sm:inline">{isSyncingSheets ? 'Menyimpan...' : 'Ke Sheets'}</span>
-            </button>
 
-            <button
-              type="button"
-              onClick={onCreateNewInvoice}
-              title="Buat invoice baru dengan nomor urut selanjutnya"
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs"
-            >
-              <Plus className="w-3.5 h-3.5 text-[#FFD400]" />
-              <span className="hidden sm:inline">Baru</span>
-            </button>
-          </div>
+              {onCreateNewQuotation && (
+                <button
+                  type="button"
+                  onClick={onCreateNewQuotation}
+                  title="Buat surat penawaran baru"
+                  className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs"
+                >
+                  <Plus className="w-3.5 h-3.5 text-[#FFD400]" />
+                  <span className="hidden sm:inline">+ Penawaran Baru</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Center: View Switcher (Only shown when on 'generator' tab) */}
-        {activeTab === 'generator' ? (
+        {/* Center: View Switcher (Shown for both generator & quotation) */}
+        {activeTab !== 'clients' ? (
           <div className="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200 text-xs">
             <button
               type="button"
@@ -219,6 +289,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
 
         {/* Right: Output Actions (Print, Download PDF, WhatsApp, Reset) */}
         <div className="flex items-center gap-2 w-full xl:w-auto justify-end flex-wrap">
+          {/* Invoice Tab Actions */}
           {activeTab === 'generator' && (
             <>
               <button
@@ -271,19 +342,81 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             </>
           )}
 
+          {/* Quotation Tab Actions */}
+          {activeTab === 'quotation' && (
+            <>
+              {onConvertToInvoice && (
+                <button
+                  type="button"
+                  onClick={onConvertToInvoice}
+                  title="Konversi penawaran ini langsung menjadi Invoice resmi"
+                  className="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-neutral-950 text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-xs border border-amber-500"
+                >
+                  <Receipt className="w-3.5 h-3.5 text-neutral-950" />
+                  <span>Ke Invoice</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onPrint}
+                title="Cetak via Dialog Print Browser"
+                className="px-3 py-2 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5 text-neutral-700" />
+                <span className="hidden sm:inline">Cetak</span>
+              </button>
+
+              {onDownloadQuotationPdf && (
+                <button
+                  type="button"
+                  onClick={onDownloadQuotationPdf}
+                  disabled={isGeneratingPdf}
+                  className="px-3.5 py-2 rounded-xl bg-neutral-950 hover:bg-neutral-800 active:bg-black text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs disabled:opacity-50 border border-neutral-800"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-[#FFD400]" />
+                  <span>{isGeneratingPdf ? 'Membuat...' : 'Unduh PDF SPH'}</span>
+                </button>
+              )}
+
+              {onOpenQuotationWhatsApp && (
+                <button
+                  type="button"
+                  onClick={onOpenQuotationWhatsApp}
+                  className="px-3.5 py-2 rounded-xl bg-[#FFD400] hover:bg-[#E6BE00] active:bg-[#CCAA00] text-neutral-950 text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer shadow-xs border border-[#E6BE00]"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 fill-neutral-950 text-neutral-950" />
+                  <span>Kirim ke WA</span>
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Clients Tab Actions */}
           {activeTab === 'clients' && (
-            <button
-              type="button"
-              onClick={() => onActiveTabChange('generator')}
-              className="px-3.5 py-2 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
-            >
-              <Receipt className="w-3.5 h-3.5 text-[#FFD400]" />
-              <span>Buka Editor Invoice</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onActiveTabChange('quotation')}
+                className="px-3 py-2 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Buat Penawaran</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onActiveTabChange('generator')}
+                className="px-3.5 py-2 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+              >
+                <Receipt className="w-3.5 h-3.5 text-[#FFD400]" />
+                <span>Buka Editor Invoice</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
     </header>
   );
 };
-
