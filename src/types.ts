@@ -48,6 +48,58 @@ export interface InvoiceTax {
   percentage: number;
 }
 
+export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired';
+
+export interface QuotationOption {
+  id: string;
+  category: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  price: number;
+  timeline?: string;
+  isPopular?: boolean;
+  ctaText?: string;
+}
+
+export interface QuotationData {
+  quotationNumber: string;
+  quotationDate: string;
+  validUntilDate: string;
+  subject: string;
+  introduction: string;
+  studio: StudioInfo;
+  client: ClientInfo;
+  items: LineItem[];
+  options?: QuotationOption[];
+  optionsLayout?: 'cards' | 'table';
+  selectedOptionIds?: string[];
+  discount: InvoiceDiscount;
+  tax: InvoiceTax;
+  timeline: string;
+  paymentTerms: string;
+  paymentDetails: PaymentDetails;
+  notes: string;
+  terms: string[];
+  currency: string;
+  status: QuotationStatus;
+  clientApprovalNotes?: string;
+}
+
+export interface SavedQuotation {
+  id: string;
+  quotationNumber: string;
+  clientName: string;
+  clientCompany?: string;
+  subject: string;
+  quotationDate: string;
+  validUntilDate: string;
+  grandTotal: number;
+  status: QuotationStatus;
+  updatedAt: string;
+  data: QuotationData;
+}
+
 export interface InvoiceData {
   invoiceNumber: string;
   invoiceDate: string;
