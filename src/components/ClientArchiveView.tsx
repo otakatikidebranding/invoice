@@ -54,6 +54,13 @@ interface ClientArchiveViewProps {
     email?: string;
     address?: string;
   }) => void;
+  onCreateQuotationForClient?: (clientInfo: {
+    name: string;
+    company?: string;
+    whatsapp?: string;
+    email?: string;
+    address?: string;
+  }) => void;
   onOpenWhatsApp: (invoice: InvoiceData) => void;
   onBackToBuilder: () => void;
 }
@@ -62,6 +69,7 @@ export const ClientArchiveView: React.FC<ClientArchiveViewProps> = ({
   savedInvoices,
   onLoadInvoice,
   onCreateInvoiceForClient,
+  onCreateQuotationForClient,
   onOpenWhatsApp,
   onBackToBuilder,
 }) => {
@@ -522,6 +530,26 @@ export const ClientArchiveView: React.FC<ClientArchiveViewProps> = ({
                         >
                           <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
                           <span className="hidden sm:inline">WhatsApp</span>
+                        </button>
+                      )}
+
+                      {onCreateQuotationForClient && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onCreateQuotationForClient({
+                              name: client.name,
+                              company: client.company,
+                              whatsapp: client.whatsapp,
+                              email: client.email,
+                              address: client.address,
+                            })
+                          }
+                          title="Buat surat penawaran baru untuk klien ini"
+                          className="px-2.5 py-1.5 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-800 text-xs font-bold flex items-center gap-1 transition cursor-pointer shadow-2xs"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-neutral-700" />
+                          <span className="hidden sm:inline">Buat SPH</span>
                         </button>
                       )}
 
