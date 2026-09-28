@@ -79,7 +79,7 @@ export const QuotationPaper: React.FC<QuotationPaperProps> = ({ quotation }) => 
                 Project Proposal & Quotation
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-neutral-950 tracking-tight font-display leading-none">
-                INFO HARGA
+                Penawaran
               </h2>
             </div>
 
