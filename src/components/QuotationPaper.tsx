@@ -111,7 +111,7 @@ export const QuotationPaper: React.FC<QuotationPaperProps> = ({ quotation }) => 
           {/* Client Info Card (6 cols) */}
           <div className="md:col-span-6 p-2.5 print:p-2 bg-neutral-50 rounded-lg border border-neutral-200 space-y-1 flex flex-col justify-start">
             <span className="text-[9px] font-black uppercase tracking-wider text-neutral-500 block">
-              Kepada Yth.:
+              Kepada Yth.
             </span>
             <div className="space-y-0.5">
               <h3 className="text-sm font-black text-neutral-950 leading-tight">
