@@ -523,7 +523,7 @@ export const QuotationPaper: React.FC<QuotationPaperProps> = ({ quotation }) => 
                   Diajukan Oleh:
                 </span>
                 <span className="text-[8.5px] text-neutral-500 font-medium">
-                  Jakarta, {formatDateIndo(quotation.quotationDate)}
+                  {formatDateIndo(quotation.quotationDate)}
                 </span>
               </div>
               <div className="flex justify-between items-baseline pt-0.5 border-t border-neutral-200/80">
